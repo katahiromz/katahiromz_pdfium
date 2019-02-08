@@ -10,7 +10,7 @@
 #include "fpdfview.h"
 
 struct katahiromz_pdfium {
-    HINSTANCE m_hDLLInstance;
+    HINSTANCE m_hInstance;
 
     // pdfium functions:
     typedef void (__stdcall *FN_FPDF_InitLibrary)(VOID);
@@ -36,7 +36,7 @@ struct katahiromz_pdfium {
     FN_FPDF_GetPageCount        FPDF_GetPageCount;
     FN_FPDF_GetLastError        FPDF_GetLastError;
 
-    katahiromz_pdfium(bool do_load = false) : m_hDLLInstance(NULL) {
+    katahiromz_pdfium(bool do_load = false) : m_hInstance(NULL) {
         #ifndef NDEBUG
             FPDF_InitLibrary = NULL;
             FPDF_DestroyLibrary = NULL;
@@ -56,7 +56,7 @@ struct katahiromz_pdfium {
     }
 
     bool is_loaded() const {
-        return m_hDLLInstance != NULL;
+        return m_hInstance != NULL;
     }
 
     ~katahiromz_pdfium() {
@@ -65,37 +65,37 @@ struct katahiromz_pdfium {
 
     template <typename T_FN>
     T_FN get_proc(LPCSTR name) {
-        return reinterpret_cast<T_FN>(::GetProcAddress(m_hDLLInstance, name));
+        return reinterpret_cast<T_FN>(::GetProcAddress(m_hInstance, name));
     }
 
     bool load(const TCHAR *dll_name = NULL) {
         release();
         if (dll_name)
         {
-            m_hDLLInstance = ::LoadLibrary(dll_name);
+            m_hInstance = ::LoadLibrary(dll_name);
         }
         else
         {
             #ifdef _WIN64
-                m_hDLLInstance = ::LoadLibrary(TEXT("x64\\pdfium.dll"));
-                if (m_hDLLInstance == NULL) {
-                    m_hDLLInstance = ::LoadLibrary(TEXT("x64\\pdfium64.dll"));
-                    if (m_hDLLInstance == NULL) {
-                        m_hDLLInstance = ::LoadLibrary(TEXT("pdfium64.dll"));
-                        if (m_hDLLInstance == NULL) {
-                            m_hDLLInstance = ::LoadLibrary(TEXT("pdfium.dll"));
+                m_hInstance = ::LoadLibrary(TEXT("x64\\pdfium.dll"));
+                if (m_hInstance == NULL) {
+                    m_hInstance = ::LoadLibrary(TEXT("x64\\pdfium64.dll"));
+                    if (m_hInstance == NULL) {
+                        m_hInstance = ::LoadLibrary(TEXT("pdfium64.dll"));
+                        if (m_hInstance == NULL) {
+                            m_hInstance = ::LoadLibrary(TEXT("pdfium.dll"));
                         }
                     }
                 }
             #else
-                m_hDLLInstance = ::LoadLibrary(TEXT("x86\\pdfium.dll"));
-                if (m_hDLLInstance == NULL) {
-                    m_hDLLInstance = ::LoadLibrary(TEXT("pdfium.dll"));
+                m_hInstance = ::LoadLibrary(TEXT("x86\\pdfium.dll"));
+                if (m_hInstance == NULL) {
+                    m_hInstance = ::LoadLibrary(TEXT("pdfium.dll"));
                 }
             #endif
         }
 
-        if (m_hDLLInstance != NULL) {
+        if (m_hInstance) {
             #ifdef _WIN64
                 FPDF_InitLibrary = get_proc<FN_FPDF_InitLibrary>("FPDF_InitLibrary");
                 FPDF_DestroyLibrary = get_proc<FN_FPDF_DestroyLibrary>("FPDF_DestroyLibrary");
@@ -142,10 +142,10 @@ struct katahiromz_pdfium {
     }
 
     void release() {
-        if (m_hDLLInstance) {
+        if (m_hInstance) {
             FPDF_DestroyLibrary();
-            ::FreeLibrary(m_hDLLInstance);
-            m_hDLLInstance = NULL;
+            ::FreeLibrary(m_hInstance);
+            m_hInstance = NULL;
         }
     }
 }; // struct katahiromz_pdfium
