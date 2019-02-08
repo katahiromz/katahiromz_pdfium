@@ -121,17 +121,17 @@ struct katahiromz_pdfium {
                 FPDF_GetPageCount = get_proc<FN_FPDF_GetPageCount>("_FPDF_GetPageCount@4");
                 FPDF_GetLastError = get_proc<FN_FPDF_GetLastError>("_FPDF_GetLastError@0");
             #endif
-            if (FPDF_InitLibrary != NULL && 
-                FPDF_DestroyLibrary != NULL && 
-                FPDF_LoadDocument != NULL && 
-                FPDF_LoadPage != NULL && 
-                FPDF_GetPageWidth != NULL && 
-                FPDF_GetPageHeight != NULL && 
-                FPDF_RenderPage != NULL && 
-                FPDF_ClosePage != NULL && 
-                FPDF_CloseDocument != NULL &&
-                FPDF_GetPageCount != NULL &&
-                FPDF_GetLastError != NULL)
+            if (FPDF_InitLibrary &&
+                FPDF_DestroyLibrary &&
+                FPDF_LoadDocument &&
+                FPDF_LoadPage &&
+                FPDF_GetPageWidth &&
+                FPDF_GetPageHeight &&
+                FPDF_RenderPage &&
+                FPDF_ClosePage &&
+                FPDF_CloseDocument &&
+                FPDF_GetPageCount &&
+                FPDF_GetLastError)
             {
                 FPDF_InitLibrary();
                 return true;
